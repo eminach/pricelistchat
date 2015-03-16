@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using PriceList.Models;
+using Newtonsoft.Json;
 
 namespace PriceList.Controllers
 {
@@ -21,9 +22,12 @@ namespace PriceList.Controllers
         public IEnumerable<Message> GetMessages()
         {
             //return db.Messages.ToList();
-            db.Configuration.ProxyCreationEnabled = false;
+            //db.Configuration.LazyLoadingEnabled = false;
+           db.Configuration.ProxyCreationEnabled = false; 
             var msgs = db.Messages.Include(m => m.User)
-                .Include(m => m.AskedDevice).AsEnumerable();
+                .Include(m => m.AskedDevice)
+                .Include(r=>r.Replies).AsEnumerable();
+            var jMessage = JsonConvert.SerializeObject(msgs);
             return msgs;
         }
         //[ActionName("PreviousMessages")]

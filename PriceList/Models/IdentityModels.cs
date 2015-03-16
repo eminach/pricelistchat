@@ -24,7 +24,9 @@ namespace PriceList.Models
 
         [StringLength(10000), DataType(DataType.MultilineText)]
         public string Contacts { get; set; }
-        
+
+        public ConnectionStatus Status { get; set; }
+
         public ClaimsIdentity GenerateUserIdentity(ApplicationUserManager manager)
         {
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType

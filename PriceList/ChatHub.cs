@@ -18,13 +18,30 @@ namespace PriceList
     public class ChatHub : Hub
     {
         private ApplicationDbContext db = new ApplicationDbContext();
+
         public override System.Threading.Tasks.Task OnConnected()
         {
-            db.Connections.Add(new Connection() { ConnectionID = Context.ConnectionId, ConnectedDate = DateTime.Now, User = Context.User.Identity.Name });
-            db.SaveChangesAsync();
+            var curUser = GetCurrentUser();
+            if (curUser != null)
+            {
+                db.Connections.Add(new Connection() { ConnectionID = Context.ConnectionId, ConnectedDate = DateTime.Now, User = Context.User.Identity.Name, Status = ConnectionStatus.Online });
+                curUser.Status = ConnectionStatus.Online;
+                db.SaveChangesAsync();
+            }
+            ShowOnlineUsers();
             return base.OnConnected();
         }
-        
+        public override Task OnDisconnected(bool stopCalled)
+        {
+            var connectedUsers = db.Connections.Where(c => c.User == Context.User.Identity.Name);
+            foreach (var item in connectedUsers)
+            {
+                item.Status = ConnectionStatus.Disconnected;
+            }
+            GetCurrentUser().Status = ConnectionStatus.Disconnected;
+            db.SaveChangesAsync();
+            return base.OnDisconnected(stopCalled);
+        }
 
         public void Send(string message, int device)
         {
@@ -37,14 +54,34 @@ namespace PriceList
                 PostDate = DateTime.Now,
                 MessageText = message,
                 User = curUser,//GetCurrentUser(),
-                AskedDevice=GetDeviceByID(device)
+                AskedDevice = GetDeviceByID(device)
             };
 
             SaveMessage(msg);
-         
+
             var jMessage = JsonConvert.SerializeObject(msg);
 
             Clients.All.broadcastMessage(jMessage);
+        }
+        public void Reply(object id, string amount)
+        {
+            Guid mID = Guid.Parse(id.ToString());
+            var message = db.Messages.Find(mID);
+            message.Replies.Add(new Reply()
+            {
+                Amount=decimal.Parse(amount),
+                PostDate = DateTime.Now,
+                User = GetCurrentUser()
+            });
+            db.SaveChangesAsync();
+        }
+        public async Task ShowOnlineUsers()
+        {
+            var ActiveUsers = await db.Users.Where(c => c.Status == ConnectionStatus.Online).Select(u => new { u.CompanyName, u.FirstName }).ToListAsync();
+            //  Dictionary<string, string> usersList = new Dictionary<string, string>();
+            // var jUsers = JsonConvert.SerializeObject(ActiveUsers);
+
+            Clients.All.activeUsersList(ActiveUsers);
         }
 
         private Device GetDeviceByID(int device)
@@ -68,7 +105,7 @@ namespace PriceList
 
         //    await Clients.All.previousMessages(previousMessages.AsEnumerable().Reverse());
         //}
-       
+
         private ApplicationUser GetCurrentUser()
         {
             var store = new UserStore<ApplicationUser>(db);
