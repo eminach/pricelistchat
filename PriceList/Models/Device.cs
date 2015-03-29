@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -7,6 +8,7 @@ using System.Web;
 
 namespace PriceList.Models
 {
+    [JsonObject(IsReference = true)] 
     public class Device
     {
         [Key]
@@ -18,5 +20,9 @@ namespace PriceList.Models
 
         public string Fullname { get; set; }
     }
-    
+    public class DeviceList
+    {
+        public int ID { get; set; }
+        public string FullName { get; set; }
+    }
 }

@@ -69,6 +69,7 @@ namespace PriceList
             var message = db.Messages.Find(mID);
             message.Replies.Add(new Reply()
             {
+                ID=Guid.NewGuid(),
                 Amount=decimal.Parse(amount),
                 PostDate = DateTime.Now,
                 User = GetCurrentUser()

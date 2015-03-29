@@ -22,14 +22,13 @@
                             <div class="panel-collapse expand" id="collapseOne">
                                 <div class="panel-body">
                                     <ul id="chatlist" class="chat">
-                                     
                                     </ul>
                                 </div>
                                 <div class="panel-footer">
                                     <div class="input-group">
                                         <input id="txt-message" style="max-width: 650px;" type="text" class="form-control input-sm" autocomplete="off" placeholder="Type your message here..." />
-                                        
-                                         <span class="input-group-btn">
+
+                                        <span class="input-group-btn">
                                             <input class="btn btn-warning btn-sm" type="button" value="Send" id="btn-send" />
                                         </span>
                                     </div>
@@ -43,21 +42,63 @@
 
         </div>
         <div class="col-md-2">
+            List of users:
+            <ul id="onlineUsers"></ul>
         </div>
-
+        <script id="message-template" type="text/x-handlebars-template">
+            <li class="message left clearfix" data-message-id="{{ID}}">
+                <div class="row">
+                    <div class="col-md-10">
+                        <span class="chat-img pull-left">
+                            <img src="http://placehold.it/50/55C1E7/fff&text=U" alt="User Avatar" class="img-circle" /></span>
+                        <div class="chat-body clearfix">
+                            <div class="header">
+                                <strong class="primary-font">{{User.FirstName}}</strong>
+                                <small class="pull-right text-muted"><span class="glyphicon glyphicon-time"></span>
+                                    <span class="timeago">{{timeago PostDate}}</span></small>
+                            </div>
+                            <div>{{AskedDevice.Fullname}} </div>
+                            <div class="pull-right">
+                                <a href="#" class="reply pull-left" data-message-id='{{ID}}'>
+                                    <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>reply</a>
+                                <div data-message="" class="amount hidden pull-right col-sm-3 input-group input-group-sm pull-right">
+                                    <span class="input-group-addon" id="sizing-addon3">AED</span>
+                                    <input type="text" class="form-control amount-value" placeholder="0.00" aria-describedby="sizing-addon3">
+                                    <span class="input-group-btn">
+                                        <button class="gobtn btn btn-default" type="button">Go!</button></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="reply-box">
+                            <span>Replies:</span>
+                            <ul>
+                                {{#each Replies}}
+                                    <li>{{Amount}} AED</li>
+                                {{/each}}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </script>
 
         <script src="Scripts/jquery.signalR-2.1.2.js"></script>
         <link rel="stylesheet" href="//code.jquery.com/ui/1.11.3/themes/smoothness/jquery-ui.css">
         <script src="signalr/hubs"></script>
-        <script src="Scripts/jquery.timeago.js"></script>
+        <script src="Scripts/swag.min.js"></script>
         <script src="//code.jquery.com/ui/1.11.3/jquery-ui.js"></script>
+        <script>Swag.registerHelpers(Handlebars);</script>
         <script type="text/javascript">
             $(document).on("click", ".reply", function (e) {
                 var id = $(this).data("message-id");
-                $('li[data-message-id=' + id+'] .amount').removeClass('hidden');
+                $('li[data-message-id=' + id + '] .amount').removeClass('hidden');
                 $('li[data-message-id=' + id + '] .amount').addClass('animated bounceInRight');
-            })
+            });
+
             $(function () {
+
                 $('#txt-message').autocomplete({
                     source: function (request, response) {
                         $.ajax({
@@ -90,56 +131,46 @@
                     }
                 })
             });
-        </script>
-        <%-- <script type="text/javascript">
-            $(document).ready(function () {
-               
-            });
-        </script>--%>
-        <script type="text/javascript">
- 
-            $(function () {
-               
-                // Declare a proxy to reference the hub. 
-                function DrawMessage(msg) {                    
-                    var eachmessage = '<li class="left clearfix"  data-message-id=' + msg.ID + '><span class="chat-img pull-left">' +
-                          '<img src="http://placehold.it/50/55C1E7/fff&text=U" alt="User Avatar" class="img-circle" />' +
-                            '</span>' +
-                                '<div class="chat-body clearfix">' +
-                                    '<div class="header"><strong class="primary-font">' +
-                                          msg.User.FirstName +
-                                          '</strong> <small class="pull-right text-muted">' +
-                                          '<span class="glyphicon glyphicon-time"></span><abbr class="timeago">' + jQuery.timeago(msg.PostDate) + '</abbr></small></div>' +
-                                           '<p>' + msg.AskedDevice.Fullname + '</p>' +
-                                           '<p class="pull-right"><a href="#" class="reply pull-left" data-message-id=' + msg.ID + '><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>reply</a>' +
-                                                 '<div data-message="" class="amount hidden pull-right col-sm-3 input-group input-group-sm pull-right">' +
-                                                    '<span class="input-group-addon" id="sizing-addon3">AED</span>' +
-                                                       '<input type="text" class="form-control" placeholder="0.00" aria-describedby="sizing-addon3">'+
-                                                       ' <span class="input-group-btn">'+
-                                                       '   <button class="gobtn btn btn-default" type="button">Go!</button></span></div>' +
-                                           ' </p></div></li>';
+            
+                $(function () {
+                    function DrawMessage(msg) {
+                        var messageTemplate = $("#message-template").html();
+                        var template = Handlebars.compile(messageTemplate);
+                        var eachMessage = template(msg);
+                        $('#chatlist').append($.parseHTML(eachMessage));
+                    }
+                    // $('.timeago').timeago();
+                    //$('#chatlist .timeago').timeago();
+                    // Declare a proxy to reference the hub.
+                    var chat = $.connection.chatHub;
 
-                    $('#chatlist').append(eachmessage);
-                }
-
-                var chat = $.connection.chatHub;
-                // Create a function that the hub can call to broadcast messages.
-                chat.client.broadcastMessage = function (msg) {
-                    DrawMessage(msg);
-                };
-                // Get the user name and store it to prepend to messages.
-                $('#displayname').val('Emin');
-                // Set initial focus to message input box.  
-                $('#txt-message').focus();
-                // Start the connection.
-                $.connection.hub.start().done(function () {
-                    $.getJSON('api/Messages', function (data) {
-                        $.each(data, function (key, item) {
-                            message = item.AskedDevice.Fullname;
-                            DrawMessage(item);
+                    $(document).on('click', "#chatlist li .gobtn", function (e) {
+                        var li = $(this).closest("li");
+                        var id = li.data("message-id");
+                        var amount = li.find(".amount-value").val();
+                        chat.server.reply(id, amount);
+                    });
+                    // Create a function that the hub can call to broadcast messages.
+                    chat.client.broadcastMessage = function (msg) {
+                        DrawMessage(msg);
+                    };
+                    chat.client.activeUsersList = function (users) {
+                        if (users.length != 0) {
+                            $.each(users, function (key, item) {
+                                $('#onlineUsers').append('<li>' + item.CompanyName + '</li>');
+                            })
+                        }
+                    };
+                    $('#txt-message').focus();
+                    // Start the connection.
+                    $.connection.hub.start().done(function () {
+                        console.log('Now connected, connection ID=' + $.connection.hub.id);
+                        $.getJSON('api/Messages', function (data) {
+                            $.each(data, function (key, item) {
+                                DrawMessage(item);
+                            })
                         })
-                    })
-                    console.log('Now connected, connection ID=' + $.connection.hub.id);
+                    });
                     $('#btn-send').click(function () {
                         // Call the Send method on the hub. 
                         chat.server.send($('#txt-message').val, $('#txt-message').data('selected-device'));
@@ -147,27 +178,9 @@
                         $('#txt-message').val('').focus();
                     });
 
-                    $('#txt-message').keydown(function (event) {
-                        if (event.which == 13) {
 
-                            event.preventDefault();
-                            chat.server.send($('#txt-message').val, $('#txt-message').data('selected-device'));
-                            // Clear text box and reset focus for next comment. 
-                            $('#txt-message').val('').focus();
-                            return false;
-                        }
-                    });
-                    $('#chatlist li .gobtn').on('click', function () {
-                        var id = $(this).data("message-id");
-                        alert(id);
-                    })
+
                 });
-
-                jQuery("abbr.timeago").timeago();
-            });
-            //Bu ne zibildir eee nese chatnan elaqelidi gozleyin 
-
-          
 
         </script>
 

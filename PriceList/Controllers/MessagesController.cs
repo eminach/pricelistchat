@@ -27,7 +27,6 @@ namespace PriceList.Controllers
             var msgs = db.Messages.Include(m => m.User)
                 .Include(m => m.AskedDevice)
                 .Include(r=>r.Replies).AsEnumerable();
-            var jMessage = JsonConvert.SerializeObject(msgs);
             return msgs;
         }
         //[ActionName("PreviousMessages")]

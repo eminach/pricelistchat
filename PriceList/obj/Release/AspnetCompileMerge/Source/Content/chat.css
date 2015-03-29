@@ -4,7 +4,10 @@
     margin: 0;
     padding: 0;
 }
-
+.chat-body{
+    padding-right:20px;
+    border-right: 1px dotted #B3A9A9;
+}
 .chat li
 {
     margin-bottom: 10px;
@@ -56,4 +59,18 @@
 {
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
     background-color: #555;
+}
+.chat .reply-box
+{
+    background-color:#555;
+    color:#fff;
+    padding:4px 3px 4px 10px;
+}
+.chat .reply-box ul{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.chat .reply-box ul li{
+    margin-left:6px;
 }

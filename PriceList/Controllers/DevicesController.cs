@@ -22,30 +22,31 @@ namespace PriceList.Controllers
         {
             return db.Devices;
         }
-        //[Route("Devices/ByKeyword/{keyword}")]
-        //[ActionName("ByKeyword")]
-        //[HttpGet]
-        //public IEnumerable<Device> ByKeyword(string term)
-        //{
-        //    if (!string.IsNullOrEmpty(term))
-        //        return db.Devices.Where(x => x.FullName.Contains(term));
-        //    else
-        //        return null;
-        //}
+       
         [ActionName("ByKeyword"), HttpGet]
-        public IDictionary<int, string> ByKeyword(string term)
+        public IEnumerable<Device> ByKeyword(string q="")
         {
-            //var collect = (from device in db.Devices
-            //               let fulname = device.Model.Brand.BrandName + " " + device.Model.ModelName + " " + device.Specification
-            //               where fulname.Contains(term)
-            //               select new { device.ID, fulname }).AsEnumerable();
-            var collect= (from device in db.Devices
-                         where device.Fullname.Contains(term)
-                         select new { device.ID, device.Fullname }).AsEnumerable();
-            return collect.ToDictionary(x => x.ID, x => x.Fullname);
-
-
+            db.Configuration.LazyLoadingEnabled = false;
+            db.Configuration.ProxyCreationEnabled = false; 
+            var collect = (from device in db.Devices
+                           where device.Fullname.Contains(q)
+                           select device).AsEnumerable();
+            return collect;
         }
+        //[ActionName("ByKeyword"), HttpGet]
+        //public IDictionary<int, string> ByKeyword(string term)
+        //{
+        //    var collect = (from device in db.Devices
+        //                   let fulname = device.Model.Brand.BrandName + " " + device.Model.ModelName + " " + device.Specification
+        //                   where fulname.Contains(term)
+        //                   select new { device.ID, fulname }).AsEnumerable();
+        //    var collect = (from device in db.Devices
+        //                   where device.Fullname.Contains(term)
+        //                   select new { device.ID, device.Fullname }).AsEnumerable();
+        //    return collect.ToDictionary(x => x.ID, x => x.Fullname);
+
+
+        //}
         //// GET: api/Devices/5
         [ResponseType(typeof(Device))]
         public async Task<IHttpActionResult> GetDevice(int id)
