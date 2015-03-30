@@ -59,9 +59,9 @@ namespace PriceList
 
             SaveMessage(msg);
 
-            var jMessage = JsonConvert.SerializeObject(msg);
+           // var jMessage = JsonConvert.SerializeObject(msg);
 
-            Clients.All.broadcastMessage(jMessage);
+            Clients.All.broadcastMessage(msg);
         }
         public void Reply(object id, string amount)
         {
@@ -75,6 +75,7 @@ namespace PriceList
                 User = GetCurrentUser()
             });
             db.SaveChangesAsync();
+            Clients.All.broadcastReply(id, amount);
         }
         public async Task ShowOnlineUsers()
         {
