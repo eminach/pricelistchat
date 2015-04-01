@@ -15,8 +15,8 @@ namespace PriceList
             //json.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore; 
             //config.Formatters.Remove(config.Formatters.XmlFormatter);
 
-            //config.Formatters.JsonFormatter.SerializerSettings.PreserveReferencesHandling =Newtonsoft.Json.PreserveReferencesHandling.Objects;
-            //config.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Serialize; 
+            config.Formatters.JsonFormatter.SerializerSettings.PreserveReferencesHandling =Newtonsoft.Json.PreserveReferencesHandling.Objects;
+           // config.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore; 
 
             // Web API routes
             config.MapHttpAttributeRoutes();

@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PriceList.Models
 {
-    [JsonObject(IsReference = true)] 
+    //[JsonObject(IsReference = true)] 
     public class Message
     {
         public Message()

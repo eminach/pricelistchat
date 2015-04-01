@@ -5,30 +5,61 @@ using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using PriceList.Models;
 using Newtonsoft.Json;
+using System.Web.Helpers;
+using PriceList.ViewModels;
+using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNet.Identity;
+using Microsoft.Owin;
 
 namespace PriceList.Controllers
 {
     public class MessagesController : ApiController
     {
         private ApplicationDbContext db = new ApplicationDbContext();
-                                                               
+        
         // GET: api/Messages
-        public IEnumerable<Message> GetMessages()
+        public IEnumerable<MessageViewModel> GetMessages()
         {
-            //return db.Messages.ToList();
-            //db.Configuration.LazyLoadingEnabled = false;
-           db.Configuration.ProxyCreationEnabled = false; 
+            var userId=RequestContext.Principal.Identity.GetUserId();
+
+            db.Configuration.ProxyCreationEnabled = false;
             var msgs = db.Messages.Include(m => m.User)
                 .Include(m => m.AskedDevice)
-                .Include(r=>r.Replies).AsEnumerable();
-            return msgs;
+                .Include(r => r.Replies).AsEnumerable();
+            var msgsEdited = from m in msgs
+                             orderby m.PostDate
+                             select new MessageViewModel
+                             {
+                                 ID = m.ID,
+                                 MessageText = m.MessageText,
+                                 PostDate = m.PostDate,
+                                 UserName = m.User.UserName,
+                                 UserFullName = m.User.FirstName,
+                                 UserCompany = m.User.CompanyName,
+                                 DeviceName = m.AskedDevice.Fullname,
+                                 //BrandID = m.AskedDevice.Model.BrandID,
+                                 ModelID = m.AskedDevice.ModelID,
+                                 Replies = (from r in m.Replies
+                                            where r.User.Id == userId
+                                            orderby r.PostDate
+                                            select new ReplyViewModel
+                                            {
+                                                ID = r.ID,
+                                                Amount = r.Amount,
+                                                MessageID = m.ID,
+                                                UserName = m.User.UserName,
+                                                UserFullName = m.User.FirstName,
+                                                UserCompany = m.User.CompanyName
+                                            }).ToList()
+                             };
+            return msgsEdited;
         }
+
         //[ActionName("PreviousMessages")]
         //public async Task<IEnumerable<Message>> GetMessages(int count)
         //{
