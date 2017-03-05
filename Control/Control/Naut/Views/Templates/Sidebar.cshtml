@@ -1,0 +1,25 @@
+<!-- START Sidebar-->
+<div class="sidebar-wrapper">
+   <div ui-sidebar="" class="sidebar">
+      <div class="sidebar-nav">
+         <ul class="nav">
+            <!-- Iterates over all sidebar items-->
+            <li class="nav-heading">
+               <span translate="sidebar.heading.HEADER" class="text-muted">Main Navigation</span>
+            </li>
+            <li ng-class="{active:$state.includes('app')}">
+               <a ui-sref="app.dashboard" title="Layouts" ripple="">
+                   <em class="sidebar-item-icon icon-pie-graph"></em>
+                  <!--<em class="sidebar-item-caret fa pull-right fa-angle-right"></em>-->
+                  <span>Dashboard</span>
+               </a>
+                <a ui-sref="app.forms.xeditable" title="Layouts" ripple="">
+                    <em class="sidebar-item-icon icon-pie-graph"></em>
+                    <span>Form</span>
+                </a>
+            </li>
+         </ul>
+      </div>
+   </div>
+</div>
+<!-- END Sidebar-->

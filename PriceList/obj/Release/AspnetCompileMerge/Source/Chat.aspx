@@ -93,11 +93,11 @@
                             <img src="http://placehold.it/50/55C1E7/fff&text=U" alt="User Avatar" class="img-circle" /></span>
                         <div class="chat-body clearfix">
                             <div class="header">
-                                <strong class="primary-font">{{User.FirstName}}</strong>
+                                <strong class="primary-font">{{UserCompany}}</strong>
                                 <small class="pull-right text-muted"><span class="glyphicon glyphicon-time"></span>
                                     <span class="timeago">{{timeago PostDate}}</span></small>
-                            </div>
-                            <div>{{AskedDevice.Fullname}} </div>
+                            </div>                            
+                            <div>{{MessageText}} </div>
                             <div class="pull-right">
                                 <a href="#" class="reply pull-left" data-message-id='{{ID}}'>
                                     <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>reply</a>
@@ -113,10 +113,10 @@
                     <div class="col-md-2" id="reply-container">
                         {{#if Replies}}
                         <div class="reply-box">
-                            <span>Replies:</span>
+                            <span>Prices in AED:</span>
                             <ul data-reply-msg-id="{{ID}}">
                                 {{#each Replies}}
-                                    <li>{{Amount}} AED</li>
+                                    <li>{{Amount}}-{{UserCompany}}</li>
                                 {{/each}}
                             </ul>
                         </div>
@@ -142,6 +142,7 @@
         <script src="Scripts/swag.min.js"></script>
         <script>Swag.registerHelpers(Handlebars);</script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/js/select2.js"></script>
+        <script src="Scripts/cycle.js"></script>
         <script src="Scripts/Chat.js"></script>
 
 

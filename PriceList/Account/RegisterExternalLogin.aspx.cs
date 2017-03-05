@@ -5,6 +5,7 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Owin;
 using PriceList.Models;
+using System.Security.Claims;
 
 namespace PriceList.Account
 {
@@ -31,6 +32,7 @@ namespace PriceList.Account
         {
             // Process the result from an auth provider in the request
             ProviderName = IdentityHelper.GetProviderNameFromRequest(Request);
+            
             if (String.IsNullOrEmpty(ProviderName))
             {
                 RedirectOnFail();
@@ -76,6 +78,7 @@ namespace PriceList.Account
                 else
                 {
                     email.Text = loginInfo.Email;
+                    
                 }
             }
         }        
@@ -93,16 +96,39 @@ namespace PriceList.Account
             }
             var manager = Context.GetOwinContext().GetUserManager<ApplicationUserManager>();
             var signInManager = Context.GetOwinContext().GetUserManager<ApplicationSignInManager>();
-            var user = new ApplicationUser() { UserName = email.Text, Email = email.Text };
+            var loginInfo = Context.GetOwinContext().Authentication.GetExternalLoginInfo();
+            var user = new ApplicationUser() { };
+            if (loginInfo.Login.LoginProvider == "Google")
+            {
+                var externalIdentity = Context.GetOwinContext().Authentication.GetExternalIdentityAsync(DefaultAuthenticationTypes.ExternalCookie);
+                var emailClaim = externalIdentity.Result.FindFirst(c => c.Type == ClaimTypes.Email);
+                var lastNameClaim = externalIdentity.Result.FindFirst(c => c.Type == ClaimTypes.Surname);
+                var givenNameClaim = externalIdentity.Result.FindFirst(c => c.Type == ClaimTypes.GivenName);
+
+                user.Email= emailClaim.Value;
+                user.FirstName= givenNameClaim.Value;
+                user.UserName = lastNameClaim.Value;
+                user.CompanyName = CompanyName.Text;
+                user.Contacts = Contacts.Text;
+            }
+            else
+            {
+                user.FirstName = FirstName.Text;
+                user.Email = email.Text;
+                user.CompanyName = CompanyName.Text;
+                user.Contacts = Contacts.Text;
+            }
+            
             IdentityResult result = manager.Create(user);
             if (result.Succeeded)
             {
-                var loginInfo = Context.GetOwinContext().Authentication.GetExternalLoginInfo();
+                
                 if (loginInfo == null)
                 {
                     RedirectOnFail();
                     return;
                 }
+                
                 result = manager.AddLogin(user.Id, loginInfo.Login);
                 if (result.Succeeded)
                 {

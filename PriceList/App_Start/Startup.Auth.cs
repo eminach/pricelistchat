@@ -55,15 +55,15 @@ namespace PriceList
             //   consumerKey: "",
             //   consumerSecret: "");
 
-            //app.UseFacebookAuthentication(
-            //   appId: "",
-            //   appSecret: "");
+            app.UseFacebookAuthentication(
+               appId: "1580895368836319",
+               appSecret: "e528dc8c94c018679318bdc774353347");
 
-            //app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
-            //{
-            //    ClientId = "",
-            //    ClientSecret = ""
-            //});
+            app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
+            {
+                ClientId = "741218467086-rlq7cgqqn52rhjei5mr6d2ga1g39ikn3.apps.googleusercontent.com",
+                ClientSecret = "3khdDq7KIGKlcvblpmrxNdVN"
+            });
         }
     }
 }

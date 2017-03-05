@@ -1,0 +1,86 @@
+<div class="settings-inner">
+   <div ng-click="showSettings = !showSettings" class="settings-button">
+      <em class="icon-cog"></em>
+   </div>
+   <div ng-controller="SettingsController" class="settings">
+      <div class="settings-inner">
+         <div class="settings-content">
+            <div class="pt ph">
+               <p class="text-muted">THEMES</p>
+               <div class="clearfix mb">
+                  <div ng-repeat="theme in themes" class="pull-left wd-tiny mb">
+                     <div class="setting-color">
+                        <label>
+                           <input type="radio" name="setting-theme" ng-model="app.themeId" ng-value="$index" ng-change="setTheme($index)" />
+                           <span class="icon-check"></span>
+                           <ul class="list-table">
+                              <li ng-class="theme.sidebar"></li>
+                              <li ng-class="theme.brand"></li>
+                              <li ng-class="theme.topbar"></li>
+                           </ul>
+                        </label>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <hr/>
+            <div class="p">
+               <p class="text-muted">LAYOUT</p>
+               <div class="clearfix">
+                  <p class="pull-left">Fixed</p>
+                  <div class="pull-right">
+                     <label class="switch switch-info">
+                        <input type="checkbox" ng-model="app.layout.isFixed" ng-disabled="app.layout.isMaterial" />
+                        <span></span>
+                     </label>
+                  </div>
+               </div>
+               <div class="clearfix">
+                  <p class="pull-left">Boxed</p>
+                  <div class="pull-right">
+                     <label class="switch switch-info">
+                        <input type="checkbox" ng-model="app.layout.isBoxed" ng-disabled="app.layout.isMaterial" />
+                        <span></span>
+                     </label>
+                  </div>
+               </div>
+               <div class="clearfix">
+                  <p class="pull-left">Material</p>
+                  <div class="pull-right">
+                     <label ng-click="app.layout.isBoxed = false; app.layout.isFixed = true" class="switch switch-info">
+                        <input type="checkbox" ng-model="app.layout.isMaterial" ng-disabled="app.layout.isDocked" />
+                        <span></span>
+                     </label>
+                  </div>
+               </div>
+            </div>
+            <div class="p">
+               <p class="text-muted">FOOTER</p>
+               <div class="clearfix">
+                  <p class="pull-left">Hidden</p>
+                  <div class="pull-right">
+                     <label class="switch switch-info">
+                        <input type="checkbox" ng-model="app.footer.hidden" />
+                        <span></span>
+                     </label>
+                  </div>
+               </div>
+            </div>
+            <hr/>
+            <div class="p">
+               <!-- START Language list-->
+               <div class="pull-right">
+                  <div dropdown="" is-open="language.listIsOpen" class="btn-group btn-group-sm"><a dropdown-toggle="" class="dropdown-toggle clickable">{{language.selected}}<span class="caret"></span></a>
+                     <ul role="menu" class="dropdown-menu dropdown-menu-right animated fadeInLeft2">
+                        <li ng-repeat="(localeId, langName) in language.available"><a ng-click="language.set(localeId, $event)" href="">{{langName}}</a>
+                        </li>
+                     </ul>
+                  </div>
+               </div>
+               <!-- END Language list    -->
+               <p class="text-muted">LANGUAGE</p>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>

@@ -23,14 +23,14 @@ namespace PriceList.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
         
         // GET: api/Messages
-        public IEnumerable<MessageViewModel> GetMessages()
+        public IEnumerable<MessageViewModel> GetMessages(int offset)
         {
             var userId=RequestContext.Principal.Identity.GetUserId();
 
             db.Configuration.ProxyCreationEnabled = false;
             var msgs = db.Messages.Include(m => m.User)
                 .Include(m => m.AskedDevice)
-                .Include(r => r.Replies).AsEnumerable();
+                .Include(r => r.Replies).OrderByDescending(m=>m.PostDate).Skip(offset).Take(3).AsEnumerable();
             var msgsEdited = from m in msgs
                              orderby m.PostDate
                              select new MessageViewModel
@@ -45,8 +45,8 @@ namespace PriceList.Controllers
                                  //BrandID = m.AskedDevice.Model.BrandID,
                                  ModelID = m.AskedDevice.ModelID,
                                  Replies = (from r in m.Replies
-                                            where r.User.Id == userId
-                                            orderby r.PostDate
+                                           // where r.User.Id == userId
+                                            orderby r.PostDate descending
                                             select new ReplyViewModel
                                             {
                                                 ID = r.ID,
@@ -73,111 +73,111 @@ namespace PriceList.Controllers
         //                           .Reverse();
         //}
         // GET: api/Messages/5
-        [ResponseType(typeof(Message))]
-        public async Task<IHttpActionResult> GetMessage(Guid id)
-        {
-            Message message = await db.Messages.FindAsync(id);
-            if (message == null)
-            {
-                return NotFound();
-            }
+        //[ResponseType(typeof(Message))]
+        //public async Task<IHttpActionResult> GetMessage(Guid id)
+        //{
+        //    Message message = await db.Messages.FindAsync(id);
+        //    if (message == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return Ok(message);
-        }
+        //    return Ok(message);
+        //}
 
-        // PUT: api/Messages/5
-        [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutMessage(Guid id, Message message)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        //// PUT: api/Messages/5
+        //[ResponseType(typeof(void))]
+        //public async Task<IHttpActionResult> PutMessage(Guid id, Message message)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
 
-            if (id != message.ID)
-            {
-                return BadRequest();
-            }
+        //    if (id != message.ID)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            db.Entry(message).State = EntityState.Modified;
+        //    db.Entry(message).State = EntityState.Modified;
 
-            try
-            {
-                await db.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!MessageExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    try
+        //    {
+        //        await db.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!MessageExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-            return StatusCode(HttpStatusCode.NoContent);
-        }
+        //    return StatusCode(HttpStatusCode.NoContent);
+        //}
 
-        // POST: api/Messages
-        [ResponseType(typeof(Message))]
-        public async Task<IHttpActionResult> PostMessage(Message message)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        //// POST: api/Messages
+        //[ResponseType(typeof(Message))]
+        //public async Task<IHttpActionResult> PostMessage(Message message)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
 
-            db.Messages.Add(message);
+        //    db.Messages.Add(message);
 
-            try
-            {
-                await db.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (MessageExists(message.ID))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    try
+        //    {
+        //        await db.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateException)
+        //    {
+        //        if (MessageExists(message.ID))
+        //        {
+        //            return Conflict();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-            return CreatedAtRoute("DefaultApi", new { id = message.ID }, message);
-        }
+        //    return CreatedAtRoute("DefaultApi", new { id = message.ID }, message);
+        //}
 
-        // DELETE: api/Messages/5
-        [ResponseType(typeof(Message))]
-        public async Task<IHttpActionResult> DeleteMessage(Guid id)
-        {
-            Message message = await db.Messages.FindAsync(id);
-            if (message == null)
-            {
-                return NotFound();
-            }
+        //// DELETE: api/Messages/5
+        //[ResponseType(typeof(Message))]
+        //public async Task<IHttpActionResult> DeleteMessage(Guid id)
+        //{
+        //    Message message = await db.Messages.FindAsync(id);
+        //    if (message == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            db.Messages.Remove(message);
-            await db.SaveChangesAsync();
+        //    db.Messages.Remove(message);
+        //    await db.SaveChangesAsync();
 
-            return Ok(message);
-        }
+        //    return Ok(message);
+        //}
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+        //protected override void Dispose(bool disposing)
+        //{
+        //    if (disposing)
+        //    {
+        //        db.Dispose();
+        //    }
+        //    base.Dispose(disposing);
+        //}
 
-        private bool MessageExists(Guid id)
-        {
-            return db.Messages.Count(e => e.ID == id) > 0;
-        }
+        //private bool MessageExists(Guid id)
+        //{
+        //    return db.Messages.Count(e => e.ID == id) > 0;
+        //}
     }
 }

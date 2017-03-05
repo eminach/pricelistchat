@@ -8,16 +8,58 @@ $(document).on("click", ".reply", function (e) {
 
 $(function () {
     var chat = $.connection.chatHub;
+    var offset = 0
+    var limit = 20;
     // Start the connection.
     $.connection.hub.start().done(function () {
         console.log('Now connected, connection ID=' + $.connection.hub.id);
-        $.getJSON('api/Messages', function (data) {
+        $.getJSON('api/Messages?offset=' + offset, function (data) {
             DrawMessages(data);
-            //$.each(data, function (key, item) {
-            //    DrawMessage(item);
-            //})
         })
     });
+    function LoadMoreMessages(offset) {
+        $.getJSON('api/Messages?offset=' + offset, function (data) {
+            DrawMoreMessages(data);
+        })
+    };
+    $(document).on('click', '#loadmore', function () {
+        offset += limit;
+        LoadMoreMessages(offset);
+        $("#panel-body").animate({ scrollTop: $('#panel-body')[0].scrollHeight }, 1000);
+    });
+    $(document).on('click', "#chatlist li .gobtn", function (e) {
+        var li = $(this).closest("li");
+        var id = li.data("message-id");
+        var amount = li.find(".amount-value").val();
+        chat.server.reply(id, amount);
+    });
+    $('#txt-message').on("select2:select", function (e) {
+        $("#txt-message").data("selected-device", e.params.data.id);
+        $("#txt-message").data("selected-device-name", e.params.data.text);
+    });
+    // $("#txt-message").select2('open');
+
+
+    function DrawMessage(msg) {
+        var messageTempl = $("#message-template").html();
+        var tmpl = Handlebars.compile(messageTempl);
+        var eachMessage = tmpl(msg);
+        $('#chatlist').append($.parseHTML(eachMessage));
+    }
+    function DrawMessages(data) {
+        var messageTemplate = $("#messages-template").html();
+        var template = Handlebars.compile(messageTemplate);
+        //var recoverData = resolveReferences(data);
+        var eachMessage = template(data);        
+        $('#chatlist').append($.parseHTML(eachMessage));
+    }
+    function DrawMoreMessages(data) {
+        var messageTemplate = $("#messages-template").html();
+        var template = Handlebars.compile(messageTemplate);
+        //var recoverData = resolveReferences(data);
+        var eachMessage = template(data);
+        $('#chatlist').prepend($.parseHTML(eachMessage));
+    }
     $("#txt-message").select2({
         ajax: {
             url: "/api/devices/ByKeyword/s/",
@@ -49,35 +91,8 @@ $(function () {
         //formatSelection: repoFormatSelection, // omitted for brevity, see the source of this page
         //dropdownCssClass: "bigdrop", // apply css that makes the dropdown taller
     });
-    $(document).on('click', "#chatlist li .gobtn", function (e) {
-        var li = $(this).closest("li");
-        var id = li.data("message-id");
-        var amount = li.find(".amount-value").val();
-        chat.server.reply(id, amount);
-    });
-    $('#txt-message').on("select2:select", function (e) {
-        $("#txt-message").data("selected-device", e.params.data.id);
-        $("#txt-message").data("selected-device-name", e.params.data.text);
-    });
-    // $("#txt-message").select2('open');
+   
 
-
-    function DrawMessage(msg) {
-        var messageTempl = $("#message-template").html();
-        var tmpl = Handlebars.compile(messageTempl);
-        var eachMessage = tmpl(msg);
-        $('#chatlist').append($.parseHTML(eachMessage));
-    }
-    function DrawMessages(data) {
-        var messageTemplate = $("#messages-template").html();
-        var template = Handlebars.compile(messageTemplate);
-        //var recoverData = resolveReferences(data);
-        var eachMessage = template(data);
-        
-        $('#chatlist').append($.parseHTML(eachMessage));
-    }
-
-    // Create a function that the hub can call to broadcast messages.
     chat.client.broadcastMessage = function (msg) {
         DrawMessage(msg);
     };
@@ -102,11 +117,11 @@ $(function () {
     chat.client.activeUsersList = function (users) {
         if (users.length != 0) {
             $.each(users, function (key, item) {
-                $('#onlineUsers').append('<li>' + item.CompanyName + '</li>');
+                $('#onlineUsers').append('<li>' + item.FirstName + '</li>');
             })
         }
     };
-
+    
     $('#btn-send').click(function () {
         var selectedText = $('#txt-message').data('selected-device-name');
         var selectedID = $('#txt-message').data('selected-device');

@@ -18,7 +18,8 @@
                                 </div>
                             </div>
                             <div class="panel-collapse expand" id="collapseOne">
-                                <div class="panel-body">
+                                <div id="panel-body" class="panel-body">
+                                    <div id="loadmore" style="text-align:center">Load more</div>
                                     <ul id="chatlist" class="chat">
                                     </ul>
                                 </div>
@@ -52,7 +53,13 @@
                             <img src="http://placehold.it/50/55C1E7/fff&text=U" alt="User Avatar" class="img-circle" /></span>
                         <div class="chat-body clearfix">
                             <div class="header">
-                                <strong class="primary-font">{{User.FirstName}}</strong>
+                                  <strong class="primary-font">
+                                    {{#if UserCompany}}
+                                        {{UserCompany}}
+                                    {{else}}
+                                        {{UserFullName}}
+                                    {{/if}}
+                                </strong>
                                 <small class="pull-right text-muted"><span class="glyphicon glyphicon-time"></span>
                                     <span class="timeago">{{timeago PostDate}}</span></small>
                             </div>
@@ -93,7 +100,13 @@
                             <img src="http://placehold.it/50/55C1E7/fff&text=U" alt="User Avatar" class="img-circle" /></span>
                         <div class="chat-body clearfix">
                             <div class="header">
-                                <strong class="primary-font">{{UserCompany}}</strong>
+                                <strong class="primary-font">
+                                    {{#if UserCompany}}
+                                        {{UserCompany}}
+                                    {{else}}
+                                        {{UserFullName}}
+                                    {{/if}}
+                                </strong>
                                 <small class="pull-right text-muted"><span class="glyphicon glyphicon-time"></span>
                                     <span class="timeago">{{timeago PostDate}}</span></small>
                             </div>                            
@@ -137,6 +150,7 @@
                 </ul>
             </div>            
         </script>
+        
         <script src="Scripts/jquery.signalR-2.1.2.js"></script>
         <script src="signalr/hubs"></script>
         <script src="Scripts/swag.min.js"></script>

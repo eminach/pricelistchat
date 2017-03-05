@@ -1,4 +1,5 @@
-﻿$(document).on("click", ".reply", function (e) {
+﻿
+$(document).on("click", ".reply", function (e) {
     var id = $(this).data("message-id");
     $('li[data-message-id=' + id + '] .amount').removeClass('hidden');
     $('li[data-message-id=' + id + '] .amount').addClass('animated bounceInRight');
@@ -70,7 +71,9 @@ $(function () {
     function DrawMessages(data) {
         var messageTemplate = $("#messages-template").html();
         var template = Handlebars.compile(messageTemplate);
+        //var recoverData = resolveReferences(data);
         var eachMessage = template(data);
+        
         $('#chatlist').append($.parseHTML(eachMessage));
     }
 

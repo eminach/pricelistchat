@@ -38,7 +38,9 @@ namespace PriceList
             {
                 item.Status = ConnectionStatus.Disconnected;
             }
-            GetCurrentUser().Status = ConnectionStatus.Disconnected;
+            var curUser = GetCurrentUser();
+            if (curUser != null)
+                curUser.Status = ConnectionStatus.Disconnected;
             db.SaveChangesAsync();
             return base.OnDisconnected(stopCalled);
         }

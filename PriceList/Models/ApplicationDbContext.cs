@@ -34,5 +34,7 @@ namespace PriceList.Models
         public System.Data.Entity.DbSet<PriceList.Models.Reply> Replies { get; set; }
 
         public System.Data.Entity.DbSet<PriceList.Models.UserType> UserTypes { get; set; }
+
+        public System.Data.Entity.DbSet<PriceList.Models.CompanyPriceList> PriceLists { get; set; }
     }
 }
